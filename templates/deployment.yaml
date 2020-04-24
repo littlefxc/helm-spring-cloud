@@ -41,6 +41,11 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: log-volume
+              readOnly: false
+              mountPath: /app/logs
+              subPath: {{ include "helm-spring-cloud.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -53,3 +58,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      volumes:
+        - name: log-volume
+          nfs:
+            path: "/home/k8s-projects/k8s-nfs/log"
+            readOnly: false
+            server: "192.168.200.19"
