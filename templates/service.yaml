@@ -4,6 +4,7 @@ metadata:
   name: {{ include "helm-spring-cloud.fullname" . }}
   labels:
     {{- include "helm-spring-cloud.labels" . | nindent 4 }}
+    release: {{ .Release.Name}}
 spec:
   type: {{ .Values.service.type }}
   ports:
