@@ -13,6 +13,16 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "open-platform-dataservice-user-provider"
 
+persistent:
+  enabled: true
+  logVolume:
+    mountPath: /app/logs
+    volume:
+      nfs:
+        path: "/home/k8s-projects/k8s-nfs/log"
+        server: "192.168.200.19"
+        readOnly: false
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

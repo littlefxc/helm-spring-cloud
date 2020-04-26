@@ -45,11 +45,13 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.persistent.enabled }}
           volumeMounts:
             - name: log-volume
               readOnly: false
-              mountPath: /app/logs
+              mountPath: {{ .Values.persistent.logVolume.mountPath }}
               subPath: {{ include "helm-spring-cloud.fullname" . }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -62,9 +64,8 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      {{- if .Values.persistent.enabled }}
       volumes:
         - name: log-volume
-          nfs:
-            path: "/home/k8s-projects/k8s-nfs/log"
-            readOnly: false
-            server: "192.168.200.19"
+          {{- toYaml .Values.persistent.logVolume.volume | nindent 10}}
+      {{- end }}
