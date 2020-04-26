@@ -13,6 +13,21 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "open-platform-dataservice-user-provider"
 
+container:
+  commandArgs:
+    command: ["java"]
+    args:
+      - -Duser.timezone=GMT+8
+      - -Djava.security.egd=file:/dev/./urandom
+      - -jar
+      - /app/app.jar
+      - --spring.profiles.active=test
+      - --spring.cloud.consul.discovery.prefer-ip-address=false
+      - --spring.cloud.consul.host=consul-server
+      - --spring.cloud.consul.discovery.hostname={{ include "helm-spring-cloud.fullname" . }}
+      - --spring.logback.file-path=/app/logs
+      - --server.port=8080
+
 persistent:
   enabled: true
   logVolume:
