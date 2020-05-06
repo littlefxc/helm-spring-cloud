@@ -27,7 +27,21 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- toYaml .Values.resources | nindent 10 }}
+          command: ["java"]
+          args:
+            - -Duser.timezone=GMT+8
+            - -Djava.security.egd=file:/dev/./urandom
+            - -Dserver.port=8080
+            - -Dspring.cloud.consul.discovery.prefer-ip-address=false
+            - -Dspring.cloud.consul.discovery.hostname={{- include "helm-spring-cloud.fullname" .}}
+            {{- range .Values.container.args }}
+            - {{ . | quote }}
+            {{- end }}
+            - -jar
+            - /app/app.jar
+            {{- range .Values.container.additionalArgs }}
+            - {{ . | quote }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 8080

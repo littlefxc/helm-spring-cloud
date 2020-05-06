@@ -5,28 +5,20 @@
 replicaCount: 1
 
 image:
-  repository: 192.168.195.2/dev/open-platform-dataservice-user-provider
+  repository: 192.168.195.2/dev/opf-dataservice-user-provider
   tag: "1.0.2"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: "open-platform-dataservice-user-provider"
+fullnameOverride: "opf-dataservice-user-provider"
 
 container:
-  commandArgs:
-    command: ["java"]
-    args:
-      - -Duser.timezone=GMT+8
-      - -Djava.security.egd=file:/dev/./urandom
-      - -jar
-      - /app/app.jar
-      - --spring.profiles.active=test
-      - --spring.cloud.consul.discovery.prefer-ip-address=false
-      - --spring.cloud.consul.host=consul-server
-      - --spring.cloud.consul.discovery.hostname={{ include "helm-spring-cloud.fullname" . }}
-      - --spring.logback.file-path=/app/logs
-      - --server.port=8080
+  args: {}
+  additionalArgs:
+    - "--spring.profiles.active=test"
+    - "--spring.cloud.consul.host=consul-server"
+    - "--spring.logback.file-path=/app/logs"
 
 persistent:
   enabled: true
