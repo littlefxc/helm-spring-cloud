@@ -14,11 +14,11 @@ nameOverride: ""
 fullnameOverride: "opf-dataservice-user-provider"
 
 container:
-  args: {}
-  additionalArgs:
-    - "--spring.profiles.active=test"
-    - "--spring.cloud.consul.host=consul-server"
-    - "--spring.logback.file-path=/app/logs"
+  args:
+    - -Dspring.profiles.active=test
+    - -Dspring.cloud.consul.host=consul-server
+    - -Dspring.logback.file-path=/app/logs
+  additionalArgs: []
 
 persistent:
   enabled: true
