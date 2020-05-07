@@ -34,6 +34,7 @@ spec:
             - -Dserver.port=8080
             - -Dspring.cloud.consul.discovery.prefer-ip-address=false
             - -Dspring.cloud.consul.discovery.hostname={{- include "helm-spring-cloud.fullname" .}}
+            - -Dspring.cloud.consul.discovery.health-check-critical-timeout=1d
             {{- range .Values.container.args }}
             - {{ . | quote }}
             {{- end }}

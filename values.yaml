@@ -16,7 +16,6 @@ fullnameOverride: "opf-dataservice-user-provider"
 container:
   args:
     - -Dspring.profiles.active=test
-    - -Dspring.cloud.consul.discovery.health-check-critical-timeout=1d
     - -Dspring.cloud.consul.host=consul-server
     - -Dspring.logback.file-path=/app/logs
   additionalArgs: []
