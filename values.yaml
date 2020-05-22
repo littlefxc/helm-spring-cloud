@@ -7,18 +7,28 @@ replicaCount: 1
 image:
   repository: 192.168.195.2/dev/opf-dataservice-user-provider
   tag: "1.0.2"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "opf-dataservice-user-provider"
 
 container:
-  args:
-    - -Dspring.profiles.active=test
-    - -Dspring.cloud.consul.host=consul-server
-    - -Dspring.logback.file-path=/app/logs
+  args: []
+    # - -Dspring.profiles.active=test
   additionalArgs: []
+    # - --spring.profiles.active=test
+
+springCloud:
+  active: "test"
+  tags: "version=1.0.2"
+  logPath: "/app/logs"
+  discovery: "consul-server"
+
+annotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/prometheus"
+  prometheus.io/port: "8080"
 
 persistent:
   enabled: true
@@ -53,6 +63,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 8080
+  nodePort: null
 
 ingress:
   enabled: false

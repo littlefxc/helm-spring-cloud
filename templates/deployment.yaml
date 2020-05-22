@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         {{- include "helm-spring-cloud.selectorLabels" . | nindent 8 }}
+      {{- if .Values.annotations }}
+      annotations:
+        {{- toYaml .Values.annotations | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -33,8 +37,12 @@ spec:
             - -Djava.security.egd=file:/dev/./urandom
             - -Dserver.port=8080
             - -Dspring.cloud.consul.discovery.prefer-ip-address=false
-            - -Dspring.cloud.consul.discovery.hostname={{- include "helm-spring-cloud.fullname" .}}
-            - -Dspring.cloud.consul.discovery.health-check-critical-timeout=1d
+            - -Dspring.cloud.consul.discovery.hostname={{- include "helm-spring-cloud.fullname" . }}
+            - -Dspring.cloud.consul.discovery.tags={{ .Values.springCloud.tags }}
+            - -Dspring.profiles.active={{ .Values.springCloud.active }}
+            - -Dspring.logback.file-path={{ .Values.springCloud.logPath }}
+            - -Dspring.cloud.consul.host={{ .Values.springCloud.discovery }}
+            - -Dspring.cloud.consul.discovery.health-check-critical-timeout=12h
             {{- range .Values.container.args }}
             - {{ . | quote }}
             {{- end }}
