@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm-spring-cloud.fullname" . }}
+  labels:
+    {{- include "helm-spring-cloud.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helm-spring-cloud.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "helm-spring-cloud.selectorLabels" . | nindent 8 }}
+      {{- if .Values.annotations }}
+      annotations:
+        {{- toYaml .Values.annotations | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "helm-spring-cloud.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "helm-spring-cloud.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["java"]
+          args:
+            - -Xms512m
+            - -Xmx512m
+            - -Duser.timezone=GMT+8
+            - -Djava.security.egd=file:/dev/./urandom
+            - -Dserver.port=8080
+            - -Dspring.cloud.consul.discovery.prefer-ip-address=false
+            - -Dspring.cloud.consul.discovery.hostname={{- include "helm-spring-cloud.fullname" . }}
+            - -Dspring.cloud.consul.discovery.tags={{ .Values.springCloud.tags }}
+            - -Dspring.profiles.active={{ .Values.springCloud.active }}
+            - -Dspring.logback.file-path={{ .Values.springCloud.logPath }}
+            - -Dspring.cloud.consul.host={{ .Values.springCloud.discovery }}
+            - -Dspring.cloud.consul.discovery.health-check-critical-timeout=12h
+            {{- range .Values.container.args }}
+            - {{ . | quote }}
+            {{- end }}
+            - -jar
+            - /app/app.jar
+            {{- range .Values.container.additionalArgs }}
+            - {{ . | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.persistent.enabled }}
+          volumeMounts:
+            - name: log-volume
+              readOnly: false
+              mountPath: {{ .Values.persistent.logVolume.mountPath }}
+              subPath: {{ include "helm-spring-cloud.fullname" . }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.persistent.enabled }}
+      volumes:
+        - name: log-volume
+          {{- toYaml .Values.persistent.logVolume.volume | nindent 10}}
+      {{- end }}
